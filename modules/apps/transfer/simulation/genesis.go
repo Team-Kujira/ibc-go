@@ -20,6 +20,10 @@ func RadomEnabled(r *rand.Rand) bool {
 	return r.Int63n(101) <= 75
 }
 
+func RandomPrefix(r *rand.Rand) string {
+	return simtypes.RandStringOfLength(r, 10)
+}
+
 // RandomizedGenState generates a random GenesisState for transfer.
 func RandomizedGenState(simState *module.SimulationState) {
 	var portID string
@@ -40,10 +44,16 @@ func RandomizedGenState(simState *module.SimulationState) {
 		func(r *rand.Rand) { receiveEnabled = RadomEnabled(r) },
 	)
 
+	var slashPrefix string
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc, string(types.KeySlashPrefix), &slashPrefix, simState.Rand,
+		func(r *rand.Rand) { slashPrefix = RandomPrefix(r) },
+	)
+
 	transferGenesis := types.GenesisState{
 		PortId:      portID,
 		DenomTraces: types.Traces{},
-		Params:      types.NewParams(sendEnabled, receiveEnabled),
+		Params:      types.NewParams(sendEnabled, receiveEnabled, slashPrefix),
 	}
 
 	bz, err := json.MarshalIndent(&transferGenesis, "", " ")
