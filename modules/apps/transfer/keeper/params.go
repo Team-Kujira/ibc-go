@@ -20,9 +20,16 @@ func (k Keeper) GetReceiveEnabled(ctx sdk.Context) bool {
 	return res
 }
 
+// GetSlashPrefix retrieves the slash prefix from the paramstore
+func (k Keeper) GetSlashPrefix(ctx sdk.Context) string {
+	var res string
+	k.paramSpace.Get(ctx, types.KeySlashPrefix, &res)
+	return res
+}
+
 // GetParams returns the total set of ibc-transfer parameters.
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {
-	return types.NewParams(k.GetSendEnabled(ctx), k.GetReceiveEnabled(ctx))
+	return types.NewParams(k.GetSendEnabled(ctx), k.GetReceiveEnabled(ctx), k.GetSlashPrefix(ctx))
 }
 
 // SetParams sets the total set of ibc-transfer parameters.
