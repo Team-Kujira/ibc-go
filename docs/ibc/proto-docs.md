@@ -544,6 +544,7 @@ parameter for the denomination to false.
 | ----- | ---- | ----- | ----------- |
 | `send_enabled` | [bool](#bool) |  | send_enabled enables or disables all cross-chain token transfers from this chain. |
 | `receive_enabled` | [bool](#bool) |  | receive_enabled enables or disables all cross-chain token transfers to this chain. |
+| `slash_prefix` | [string](#string) |  | In order to provide backward compatibility with IBC transfers to other IBCv3 chains, we can provide a prefix for denoms containing `/` so that they are escaped on send and receive with `:` |
 
 
 
