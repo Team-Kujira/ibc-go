@@ -10,5 +10,6 @@ import (
 
 func TestValidateParams(t *testing.T) {
 	require.NoError(t, types.DefaultParams().Validate())
-	require.NoError(t, types.NewParams(true, false).Validate())
+	require.NoError(t, types.NewParams(true, false, "factory").Validate())
+	require.Error(t, types.NewParams(true, false, "factory/").Validate())
 }
