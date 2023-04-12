@@ -359,6 +359,12 @@ func (k Keeper) refundPacketToken(ctx sdk.Context, packet channeltypes.Packet, d
 	if types.SenderChainIsSource(packet.GetSourcePort(), packet.GetSourceChannel(), data.Denom) {
 		// unescrow tokens back to sender
 		escrowAddress := types.GetEscrowAddress(packet.GetSourcePort(), packet.GetSourceChannel())
+
+		prefix := k.GetSlashPrefix(ctx)
+		if prefix != "" && strings.HasPrefix(token.Denom, prefix+":") {
+			token.Denom = strings.ReplaceAll(token.Denom, ":", "/")
+		}
+
 		return k.unescrowToken(ctx, escrowAddress, sender, token)
 	}
 
