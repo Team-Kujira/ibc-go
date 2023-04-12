@@ -109,6 +109,12 @@ func (k Keeper) sendTransfer(
 		); err != nil {
 			return 0, err
 		}
+
+		prefix := k.GetSlashPrefix(ctx)
+		if prefix != "" && strings.HasPrefix(fullDenomPath, prefix+"/") {
+			fullDenomPath = strings.ReplaceAll(fullDenomPath, "/", ":")
+		}
+
 	} else {
 		labels = append(labels, telemetry.NewLabel(coretypes.LabelSource, "false"))
 
@@ -205,14 +211,20 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		unprefixedDenom := data.Denom[len(voucherPrefix):]
 
 		// coin denomination used in sending from the escrow address
-		denom := unprefixedDenom
-
-		// The denomination used to send the coins is either the native denom or the hash of the path
-		// if the denomination is not native.
-		denomTrace := types.ParseDenomTrace(unprefixedDenom)
-		if denomTrace.Path != "" {
-			denom = denomTrace.IBCDenom()
+		var denom string
+		prefix := k.GetSlashPrefix(ctx)
+		if prefix != "" && strings.HasPrefix(unprefixedDenom, prefix+":") {
+			denom = strings.ReplaceAll(unprefixedDenom, ":", "/")
+		} else {
+			denom = unprefixedDenom
+			// The denomination used to send the coins is either the native denom or the hash of the path
+			// if the denomination is not native.
+			denomTrace := types.ParseDenomTrace(unprefixedDenom)
+			if denomTrace.Path != "" {
+				denom = denomTrace.IBCDenom()
+			}
 		}
+
 		token := sdk.NewCoin(denom, transferAmount)
 
 		if k.bankKeeper.BlockedAddr(receiver) {
