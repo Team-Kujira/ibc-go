@@ -368,7 +368,7 @@ func (k Keeper) refundPacketToken(ctx sdk.Context, packet channeltypes.Packet, d
 		// unescrow tokens back to sender
 		escrowAddress := types.GetEscrowAddress(packet.GetSourcePort(), packet.GetSourceChannel())
 
-		prefix := k.GetSlashPrefix(ctx)
+		prefix := k.GetParams(ctx).SlashPrefix
 		if prefix != "" && strings.HasPrefix(token.Denom, prefix+":") {
 			token.Denom = strings.ReplaceAll(token.Denom, ":", "/")
 		}
